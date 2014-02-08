@@ -5,8 +5,8 @@
       version="0.1.0">
     <name>Web Interface</name>
 
-    <js-module src="www/ScannerLib-Linea-2.0.0.js" name="Device">
-        <clobbers target="Device" />
+    <js-module src="www/ScannerLib-Linea-2.0.0.js" name="ScannerDevice">
+        <clobbers target="ScannerDevice" />
     </js-module>
 
     <!-- ios -->
