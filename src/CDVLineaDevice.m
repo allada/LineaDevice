@@ -52,7 +52,8 @@
 #ifndef BEGIN_ARGCHECKWRAPPER
 #define BEGIN_ARGCHECKWRAPPER(required_args, lineaConnectedCheck) \
     int i; \
-    NSString* localCallbackId = [arguments objectAtIndex:0]; \
+    NSString* localCallbackId = command.callbackId; \
+    NSArray* arguments = command.arguments; \
     CDVPluginResult* pluginResult = nil; \
     NSString* javaScript = nil; \
     NSMutableArray *returnArgs = [[NSMutableArray alloc] init]; \
@@ -64,7 +65,7 @@
             [NSException raise:@"InvalidArgument" format:@"Function requires %i arguments and %i arguments passed",required_args, [arguments count]]; \
         } \
         for (i=0;i<required_args;i++) { \
-            if([arguments objectAtIndex: i+1] == nil) { \
+            if([arguments objectAtIndex: i] == nil) { \
                 [NSException raise:@"InvalidArgument" format:@"Argument %i cannot be null",i]; \
             } \
         }
@@ -84,10 +85,11 @@
  * The following functions are called from the plugin handler of PhoneGap. These functions pass *arguments from the javascript and any options along with it.
  * *arguments is an array of all arguments the javascript function passed. arguments[0] is always the localCallbackId and all subsiquent items is the actual data.
  */
-- (void) configureAllSettings:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) configureAllSettings:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     LOG(@"Configuring");
     int i=0;
+    NSDictionary *options = [arguments objectAtIndex:0];
     if(options){
         if([options objectForKey:@"SCAN_BEEP"] && [options objectForKey:@"SCAN_BEEP_ENABLED"]){
             NSArray *sounds = [options objectForKey:@"SCAN_BEEP"];
@@ -123,16 +125,16 @@
  * @arguments[1] int        Volume (Currently the Linea Device does not support this)
  * @arguments[2] array      Array of frequentcy and durations. [freqency,duration,frequency,duration, ...]
  */
-- (void) playSound:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) playSound:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(2, true)
-    NSArray *sounds = [arguments objectAtIndex:2];
+    NSArray *sounds = [arguments objectAtIndex:1];
     int count = [sounds count];
     int *newAry = malloc(sizeof(int) * count);
     int i=0;
     for(;i<(count > 10 ? 10 : count);i++){
         newAry[i] = [[sounds objectAtIndex:i] intValue];
     }
-    [linea playSound:(int) [[arguments objectAtIndex:1] intValue] beepData:newAry length:sizeof(int) * (count > 10 ? 10 : count) error:nil];
+    [linea playSound:(int) [[arguments objectAtIndex:0] intValue] beepData:newAry length:sizeof(int) * (count > 10 ? 10 : count) error:nil];
     free(newAry);
     if(count > 10){
         [NSException raise:@"InvalidArgument" format:@"You may only send 5 sounds though this function at a time, you tried to send %i. The remaining sounds where truncated.", count];
@@ -142,7 +144,7 @@
 /**
  * Starts the lazer.
  */
-- (void) startScan:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) startScan:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     LOG(@"Started Scan");
     [linea barcodeStartScan:nil];
@@ -151,7 +153,7 @@
 /**
  * Stops the lazer.
  */
-- (void) stopScan:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) stopScan:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     LOG(@"Stopped Scan");
     [linea barcodeStopScan:nil];
@@ -159,68 +161,68 @@
 }
 /**
  * Weather the scan engine should work in persistent scan mode or single scan mode.
- * @arguments[1] int        Integer value of MODE_SINGLE_SCAN or MODE_MULTI_SCAN
+ * @arguments[0] int        Integer value of MODE_SINGLE_SCAN or MODE_MULTI_SCAN
  */
-- (void) setScanMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) setScanMode:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(1, true)
     LOG(@"Set Scan Mode");
-    [linea barcodeSetScanMode:(int) [[arguments objectAtIndex:1] intValue] error:nil];
+    [linea barcodeSetScanMode:(int) [[arguments objectAtIndex:0] intValue] error:nil];
     END_ARGCHECKWRAPPER
 }
 /**
  * Sets the beep sound when a barcode is scanned.
- * @arguments[1] boolean    Enabled or not.
- * @arguments[2] int        Volume (currently not supported by linea device)
- * @arguments[3] array      Array of frequentcy and durations. [freqency,duration,frequency,duration, ...]
+ * @arguments[0] boolean    Enabled or not.
+ * @arguments[1] int        Volume (currently not supported by linea device)
+ * @arguments[2] array      Array of frequentcy and durations. [freqency,duration,frequency,duration, ...]
  */
-- (void) setScanBeep:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) setScanBeep:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(3, true)
     LOG(@"Set Scan Beep");
-    NSArray *sounds = [arguments objectAtIndex:3];
+    NSArray *sounds = [arguments objectAtIndex:2];
     int count = [sounds count];
     int *newAry = malloc(sizeof(int) * count);
     int i=0;
     for(;i<count;i++){
         newAry[i] = [[sounds objectAtIndex:i] intValue];
     }
-    [linea barcodeSetScanBeep:(bool) [[arguments objectAtIndex:1] boolValue] volume:(int) [[arguments objectAtIndex:2] intValue] beepData:newAry length:sizeof(int) * count error:nil];
+    [linea barcodeSetScanBeep:(bool) [[arguments objectAtIndex:0] boolValue] volume:(int) [[arguments objectAtIndex:1] intValue] beepData:newAry length:sizeof(int) * count error:nil];
     free(newAry);
     END_ARGCHECKWRAPPER
 }
 /**
  * Enables the button for scanning or not
- * @arguments[1] int        Int value of BUTTON_DISABLED or BUTTON_ENABLED
+ * @arguments[0] int        Int value of BUTTON_DISABLED or BUTTON_ENABLED
  */
-- (void) setScanButtonMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) setScanButtonMode:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(1, true)
     LOG(@"Set Scan Button Mode");
-    [linea barcodeSetScanButtonMode:(int) [[arguments objectAtIndex:1] intValue] error:nil];
+    [linea barcodeSetScanButtonMode:(int) [[arguments objectAtIndex:0] intValue] error:nil];
     END_ARGCHECKWRAPPER
 }
 /**
  * Sets how to read the card.
- * @arguments[1] int    Int value for MS_PROCESSED_CARD_DATA or MS_RAW_CARD_DATA
+ * @arguments[0] int    Int value for MS_PROCESSED_CARD_DATA or MS_RAW_CARD_DATA
  */
-- (void) setMSCardDataMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) setMSCardDataMode:(CDVInvokedUrlCommand*)command {
     LOG(@"Set MS Card Data Mode");
     BEGIN_ARGCHECKWRAPPER(1, true)
-    [linea msSetCardDataMode:(int) [[arguments objectAtIndex:1] intValue] error:nil];
+    [linea msSetCardDataMode:(int) [[arguments objectAtIndex:0] intValue] error:nil];
     END_ARGCHECKWRAPPER
 }
 /**
  * Sets weather to read barcode as extended barcode types
- * @arguments[1] int    Int value for BARCODE_TYPE_DEFAULT or BARCODE_TYPE_EXTENDED
+ * @arguments[0] int    Int value for BARCODE_TYPE_DEFAULT or BARCODE_TYPE_EXTENDED
  */
-- (void) setBarcodeTypeMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) setBarcodeTypeMode:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(1, true)
     LOG(@"Set Barcode Type Mode");
-    [linea barcodeSetTypeMode:(int) [[arguments objectAtIndex:1] intValue] error:nil];
+    [linea barcodeSetTypeMode:(int) [[arguments objectAtIndex:0] intValue] error:nil];
     END_ARGCHECKWRAPPER
 }
 /**
  * Gets current scan button mode
  */
-- (void) getScanButtonMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getScanButtonMode:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     int mode;
     [linea barcodeGetScanButtonMode:&mode error:nil];
@@ -230,7 +232,7 @@
 /**
  * Gets current scan mode
  */
-- (void) getScanMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getScanMode:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     int mode;
     [linea barcodeGetScanMode:&mode error:nil];
@@ -240,7 +242,7 @@
 /**
  * Gets Battery Capacity in percent
  */
-- (void) getBatteryCapacity:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getBatteryCapacity:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     int cap;
     float vol;
@@ -251,7 +253,7 @@
 /**
  * Gets Battery Voltage
  */
-- (void) getBatteryVoltage:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getBatteryVoltage:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     int cap;
     float vol;
@@ -262,7 +264,7 @@
 /**
  * Get Charging
  */
-- (void) getCharging:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getCharging:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     BOOL charging;
     [linea getCharging:&charging error:nil];
@@ -272,19 +274,19 @@
 /**
  * Set Charging
  */
-- (void) setCharging:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) setCharging:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(1, true)
     LOG(@"Set Charge Mode");
-    [linea setCharging:[[arguments objectAtIndex:1] boolValue] error:nil];
+    [linea setCharging:[[arguments objectAtIndex:0] boolValue] error:nil];
     END_ARGCHECKWRAPPER
 }
 /**
  * Get Financial Info From Credit Card
  */
-- (void) msProcessFinancialCard:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) msProcessFinancialCard:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(2, true)
-    NSString *track1 = [arguments objectAtIndex:1];
-    NSString *track2 = [arguments objectAtIndex:2];
+    NSString *track1 = [arguments objectAtIndex:0];
+    NSString *track2 = [arguments objectAtIndex:1];
     NSDictionary *data = [linea msProcessFinancialCard:track1 track2:track2];
     [returnArgs addObject:data];
     END_ARGCHECKWRAPPER
@@ -292,14 +294,14 @@
 /**
  * Get Barcode Type Mode
  */
-- (void) getBarcodeTypeMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getBarcodeTypeMode:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     int mode;
     [linea barcodeGetTypeMode:&mode error:nil];
     [returnArgs addObject:[NSNumber numberWithInt:mode]];
     END_ARGCHECKWRAPPER
 }
-- (void) getConnectionState:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) getConnectionState:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, false)
     [returnArgs addObject:[NSNumber numberWithInt:lineaConnectionState]];
     END_ARGCHECKWRAPPER
@@ -307,9 +309,9 @@
 /**
  * Barcode Type 2 Text
  */
-- (void) barcodeType2Text:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) barcodeType2Text:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(1, true)
-    [returnArgs addObject:[linea barcodeType2Text:[[arguments objectAtIndex:1] intValue]]];
+    [returnArgs addObject:[linea barcodeType2Text:[[arguments objectAtIndex:0] intValue]]];
     END_ARGCHECKWRAPPER
 }
 
@@ -318,8 +320,8 @@
 /**
  * Sets which function will be used to monitor events from linea device.
  */
-- (void) monitor:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
-    self.callbackId = [arguments objectAtIndex:0];
+- (void) monitor:(CDVInvokedUrlCommand*)command {
+    self.callbackId = command.callbackId;
     BEGIN_ARGCHECKWRAPPER(0, false)
     	[returnArgs addObject:@"connectionState"];
     	[returnArgs addObject:[NSNumber numberWithInt:lineaConnectionState]];
@@ -335,7 +337,7 @@
 /**
  * Unsets the function used to monitor events from the linea device.
  */
-- (void) unmonitor:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void) unmonitor:(CDVInvokedUrlCommand*)command {
     BEGIN_ARGCHECKWRAPPER(0, true)
     self.callbackId = nil;
     END_ARGCHECKWRAPPER

@@ -21,13 +21,13 @@
 - (void) disconnectLinea:(NSNotification *)notification;
 
 // Start JS Callable Functions
-- (void) playSound:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) startScan:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) stopScan:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) setScanMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) setScanBeep:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) setScanButtonMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) setMSCardDataMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void) setBarcodeTypeMode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void) playSound:(CDVInvokedUrlCommand*)command;
+- (void) startScan:(CDVInvokedUrlCommand*)command;
+- (void) stopScan:(CDVInvokedUrlCommand*)command;
+- (void) setScanMode:(CDVInvokedUrlCommand*)command;
+- (void) setScanBeep:(CDVInvokedUrlCommand*)command;
+- (void) setScanButtonMode:(CDVInvokedUrlCommand*)command;
+- (void) setMSCardDataMode:(CDVInvokedUrlCommand*)command;
+- (void) setBarcodeTypeMode:(CDVInvokedUrlCommand*)command;
 // End JS Callable Functions
 @end
