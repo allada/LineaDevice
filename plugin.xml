@@ -19,7 +19,7 @@
         <header-file src="src/CDVLineaDevice.h" />
 	    <source-file src="src/CDVLineaDevice.m" />
 
-		<source-file src="src/DTDDevices.h" />
+		<header-file src="src/DTDDevices.h" />
 		<source-file src="src/libdtdev.a" framework="true"/>
     </platform>
 </plugin>
