@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+           id="com.allada.phonegap.webinterface"
+      version="0.1.0">
+    <name>Web Interface</name>
+
+    <js-module src="www/ScannerLib-Linea-2.0.0.js" name="ScannerLib">
+        <clobbers target="navigator.LineaDevice" />
+    </js-module>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="LineaDevice">
+                <param name="ios-package" value="CDVLineaDevice" />
+            </feature>
+        </config-file>
+        <header-file src="src/CDVLineaDevice.h" />
+	    <source-file src="src/CDVLineaDevice.m" />
+
+		<source-file src="src/DTDDevices.h" />
+		<source-file src="src/libdtdev.a" framework="true"/>
+    </platform>
+</plugin>
