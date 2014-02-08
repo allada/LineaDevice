@@ -21,5 +21,6 @@
 
 		<header-file src="src/DTDevices.h" />
 		<source-file src="src/libdtdev.a" framework="true"/>
+		<framework src="ExternalAccessory.framework" />
     </platform>
 </plugin>

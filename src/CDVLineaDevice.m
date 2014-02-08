@@ -75,7 +75,6 @@
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_JSON_EXCEPTION messageAsString:[exception reason]]; \
         javaScript = [pluginResult toErrorCallbackString:localCallbackId]; \
     } \
-    [returnArgs release]; \
     [self writeJavascript:[NSString stringWithFormat:@"window.setTimeout(function(){%@;},0);", javaScript]];
 #define IF_NULLOBJ(item) item ? item : [NSNull null]
 
@@ -331,7 +330,6 @@
     	pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_JSON_EXCEPTION messageAsString:[exception reason]];
     	javaScript = [pluginResult toErrorCallbackString:localCallbackId];
 	}
-	[returnArgs release];
 	[self writeJavascript:[NSString stringWithFormat:@"window.setTimeout(function(){%@;},0);", javaScript]];
 }
 /**
@@ -351,7 +349,6 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:returnArgs]; \
         [result setKeepCallbackAsBool:true]; \
         [super writeJavascript:[result toSuccessCallbackString:self.callbackId]]; \
-        [returnArgs release]; \
     }
 #define NIL2EMPTYSTR(str) str == nil?@"":str
 #endif
