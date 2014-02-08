@@ -1,13 +1,13 @@
 /**
 * Used for helpful debugging info.
-* 
+*
 * @type Boolean Weather to show events when bad stuff happens.
 */
 Debugging = true;
 /**
 * ScannerDevice library to listen and set options to the Linea device. Note that you must then register the object after it's been
 * constructed or no events will be passed to function.
-* 
+*
 * @param {Object} mappings If you wish to set listeners, you do it here by passing the listener function here.
 * @example DeviceObject = ScannerDevice({
 	barcodeData: function (data, bar_type){
@@ -46,7 +46,7 @@ ScannerDevice = function (mappings){
 	/**
 	* Used as a default callback if none is specified. Used only for error
 	* callback.
-	* 
+	*
 	* @param {Array} params Error returned by cordova or scanner.
 	* @ignore
 	*/
@@ -58,7 +58,7 @@ ScannerDevice = function (mappings){
 	/**
 	* Helper function to return the constant name of a barcode by it's ID.
 	* *Note this function only works for non extended barcodes.
-	* 
+	*
 	* @param {Int} barcode_id Barcode ID.
 	* @returns {String|Null} Constant name of barcode if exists.
 	*/
@@ -81,7 +81,7 @@ ScannerDevice = function (mappings){
 	/**
 	* Sends a command though cordova to the Linea Device. See each individual functions
 	* for available commands
-	* 
+	*
 	* @param {String} command Command to send to device.
 	* @param {Array} args Arguments to send along with command.
 	* @param {Function} callback Success callback function. Callback contains 1 arguments containing an array of arguments.
@@ -150,8 +150,8 @@ ScannerDevice = function (mappings){
 		this.sendCommand('enableBarcode', [barcode, enabled]);
 	};
 	/**
-	* Plays a sound from the linea device. 
-	* 
+	* Plays a sound from the linea device.
+	*
 	* @param {Array} sounds Sound to play. This can be in the following formats: [frequency,duration,frequency,duration,...] or [[frequency,duration], [frequency,duration], ...] or [{frequency: xxx, duration: xxx}, {frequency: xxx, duration: xxx}, ...]
 	* 	Note: This argument cannot exceed 5 sounds at a time (10 array elements).
 	*/
@@ -189,7 +189,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Sets if the scanner will remain active after scanning barcode.
-	* 
+	*
 	* @param {Int} mode Mode to scan in. See: ScannerDevice.CONSTANTS.MODE_*
 	*/
 	this.setScanMode = function (mode){
@@ -223,7 +223,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Sets if the button is enabled or disabled on the scanner.
-	* 
+	*
 	* @param {Boolean} enabled Weather to enable or disable the button.
 	*/
 	this.setScanButtonMode = function (enabled){
@@ -239,7 +239,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Sets the mode to receive the barcodes in.
-	* 
+	*
 	* @param {Int} type The mode to receive the barcodes in. See: ScannerDevice.CONSTANTS.BARCODE_TYPE_*
 	*/
 	this.setBarcodeTypeMode = function (type){
@@ -265,7 +265,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Check weather barcode is enabled or not.
-	* 
+	*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var enabled = params[0]; }
 	* @param {Int} barcode Barcode to check if enabled. See ScannerDevice.CONSTANTS.BAR_TYPES.* for available values.
 	*/
@@ -276,7 +276,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Checks if barcode is supported.
-	* 
+	*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var supported = params[0]; }
 	* @param {Int} barcode Barcode to check if supported. See ScannerDevice.CONSTANTS.BAR_TYPES.* for available values.
 	*/
@@ -287,7 +287,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Checks if device is charging.
-	* 
+	*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var charging = params[0]; }
 	*/
 	this.getCharging = function (callback){
@@ -297,7 +297,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Set if you wish to charge iphone/ipod/ipad.
-	* 
+	*
 	* @param {Boolean} enabled Weather to enable or disable charging.
 	*/
 	this.setCharging = function (enabled){
@@ -305,7 +305,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Retreives the sync button mode (Very little documentation is given on this, so I am not even sure what it does.)
-	* 
+	*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var sync_mode = params[0]; }
 	*/
 	this.getSyncButtonMode = function (callback){
@@ -337,8 +337,8 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Gets the mode cards are received in. See: ScannerDevice.CONSTANTS.MS_* for more info.
-	* 
-	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var mode = params[0]; } 
+	*
+	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var mode = params[0]; }
 	*/
 	this.getMSCardDataMode = function (callback){
 		this.sendCommand('getMSCardDataMode', [], function (params){
@@ -357,7 +357,7 @@ ScannerDevice = function (mappings){
 	/**
 	* You can turn the barcode engine off with this function. When the engine is turned back on it may take up to 2 seconds for device to be
 	* responsive again. (Don't play with this unless you know what you are doing.)
-	* 
+	*
 	* @param {Boolean} enabled Weather to enable or disable engine.
 	*/
 	this.barcodeEnginePowerControl = function (enabled){
@@ -365,7 +365,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Helper function to get the name of barcodes by their code.
-	* 
+	*
 	* @param {Int} type Barcode type to get name. See: ScannerDeice.CONSTANTS.BAR_TYPES.* for available barcodes.
 	*/
 	this.barcodeType2Text = function (type, callback){
@@ -375,7 +375,7 @@ ScannerDevice = function (mappings){
 	};
 	/**
 	* Gets the connection state of the device.
-	* 
+	*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var state = params[0]; } // See ScannerDevice.CONSTANTS.CONN_*
 	*/
 	this.getConnectionState = function (callback){
@@ -430,14 +430,14 @@ ScannerDevice.allowedFunctions = [
 ];
 /**
 * List of objects listeneing on device.
-* 
+*
 * @static
 * @private
 */
 ScannerDevice.listeners = [];
 /**
-* Registers a listener to device. 
-* 
+* Registers a listener to device.
+*
 * @param {ScannerDevice} obj ScannerDevice object to listen to device on.
 * @static
 */
@@ -459,7 +459,7 @@ ScannerDevice.registerListener = function (obj){
 };
 /**
 * Unregisters a listener to device.
-* 
+*
 * @param {ScannerDevice} obj ScannerDevice object to unregister with library.
 */
 ScannerDevice.unregisterListener = function (obj){
@@ -480,7 +480,7 @@ ScannerDevice.unregisterListener = function (obj){
 };
 /**
 * Master function to listen to events. Do not override this unless you wish to write your own library.
-* 
+*
 * @param {Array} params Params passed from device.
 * @static
 * @private
@@ -692,5 +692,7 @@ ScannerDevice.BUTTON_PRESSED = false;
 * @ignore
 */
 document.addEventListener('deviceready', function (){
-	cordova.exec(ScannerDevice.triggerEvent, function (){}, "LineaDevice", "monitor", []);	
+	cordova.exec(ScannerDevice.triggerEvent, function (){}, "LineaDevice", "monitor", []);
 }, false);
+
+module.exports = ScannerDevice;
