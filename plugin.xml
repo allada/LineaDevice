@@ -5,12 +5,17 @@
       version="0.1.0">
     <name>Web Interface</name>
 
-    <js-module src="www/ScannerLib-Linea-2.0.0.js" name="ScannerDevice">
-        <clobbers target="ScannerDevice" />
-    </js-module>
-
     <!-- ios -->
     <platform name="ios">
+		<js-module src="www/ScannerLib-Linea-2.0.0.js" name="ScannerDevice">
+			<clobbers target="ScannerDevice" />
+		</js-module>
+		<config-file target="*-Info.plist" parent="UISupportedExternalAccessoryProtocols">
+			<array>
+				<string>com.datecs.linea.pro.msr</string>
+				<string>com.datecs.linea.pro.bar</string>
+			</array>
+		</config-file>
         <config-file target="config.xml" parent="/*">
             <feature name="LineaDevice">
                 <param name="ios-package" value="CDVLineaDevice" />
