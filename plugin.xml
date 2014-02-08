@@ -23,7 +23,6 @@
         </config-file>
         <header-file src="src/CDVLineaDevice.h" />
 	    <source-file src="src/CDVLineaDevice.m" />
-
 		<header-file src="src/DTDevices.h" />
 		<source-file src="src/libdtdev.a" framework="true"/>
 		<framework src="ExternalAccessory.framework" />
