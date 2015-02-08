@@ -328,7 +328,21 @@
     [returnArgs addObject:[linea barcodeType2Text:[[arguments objectAtIndex:0] intValue]]];
     END_ARGCHECKWRAPPER
 }
-
+- (void) rfInit: (CDVInvokedUrlCommand*) command {
+    BEGIN_ARGCHECKWRAPPER(1, true)
+    [returnArgs addObject:[NSNumber numberWithBool:[linea rfInit:[[arguments objectAtIndex:0] intValue]]]];
+    END_ARGCHECKWRAPPER
+}
+- (void) rfClose: (CDVInvokedUrlCommand*) command {
+    BEGIN_ARGCHECKWRAPPER(0, true)
+    [returnArgs addObject:[NSNumber numberWithBool:[linea rfClose]];
+    END_ARGCHECKWRAPPER
+}
+- (void) rfRemoveCard: (CDVInvokedUrlCommand*) command {
+    BEGIN_ARGCHECKWRAPPER(1, true)
+    [returnArgs addObject:[NSNumber numberWithBool:[linea rfRemoveCard:[[arguments objectAtIndex:0] intValue]]];
+    END_ARGCHECKWRAPPER
+}
 
 // Non-device driven functions
 /**
@@ -428,7 +442,7 @@
     [returnArgs addObject:[NSNumber numberWithInt:slot]];
     END_JSINJECTWRAPPER
 }
--(void)barcodeData:(NSString *)barcode isotype:(NSString *)isotype{
+-(void)barcodeDataIsoType:(NSString *)barcode isotype:(NSString *)isotype{
     BEGIN_JSINJECTWARPPER
     [returnArgs addObject:@"barcodeDataIsoType"];
     [returnArgs addObject:barcode];
@@ -453,11 +467,11 @@
 -(void)rfCardDetected: (int) cardIndex info: (DTRFCardInfo *) info{
     BEGIN_JSINJECTWARPPER
     [returnArgs addObject:@"rfCardDetected"];
-    [returnArgs addObject:[NSNumber numberWithBool:cardIndex]];
+    [returnArgs addObject:[NSNumber numberWithInt:cardIndex]];
     NSDictionary *dict = [NSDictionary dictionary];
     [dict setValue:[NSNumber numberWithInt:[info type]] forKey:@"type"];
     [dict setValue:[info typeStr] forKey:@"typeStr"];
-    [dict setValue:[info UID] forKey:@"UID"];
+    [dict setValue:hexToString(nil,info.UID.bytes,info.UID.length) forKey:@"UID"];
     [dict setValue:[NSNumber numberWithInt:[info ATQA]] forKey:@"ATQA"];
     [dict setValue:[NSNumber numberWithInt:[info SAK]] forKey:@"SAK"];
     [dict setValue:[NSNumber numberWithInt:[info AFI]] forKey:@"AFI"];

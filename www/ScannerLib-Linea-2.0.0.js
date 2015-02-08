@@ -105,9 +105,6 @@ ScannerDevice = function (mappings){
 	*/
 	this.sendCommand = function (command, args, callback, errorCallback){
 		switch(command){
-			case 'enableBarcode':
-				ScannerDevice.lastSettings.barcodeStatus[parseInt(args[0])] = args[1] ? true : false;
-				break;
 			case 'playSound': break;
 			case 'startScan':
 				ScannerDevice.LAZER_ON = true;
@@ -133,21 +130,17 @@ ScannerDevice = function (mappings){
 				break;
 			case 'getBatteryCapacity': break;
 			case 'getBatteryVoltage': break;
-			case 'isBarcodeEnabled': break;
-			case 'isBarcodeSupported': break;
-			case 'getMSCardDataMode': break;
 			case 'getCharging': break;
 			case 'setCharging':
 				ScannerDevice.lastSettings.CHARGING = args[0] ? true : false;
 				break;
-			case 'getSyncButtonMode': break;
 			case 'msProcessFinancialCard': break;
 			case 'getBarcodeTypeMode': break;
-			case 'barcodeEnginePowerControl':
-				ScannerDevice.lastSettings.BARCODE_ENGINE_POWER = args[0] ? true : false;
-				break;
 			case 'barcodeType2Text': break;
 			case 'getConnectionState': break;
+			case 'rfInit': break;
+			case 'rfClose': break;
+			case 'rfRemoveCard': break;
 		}
 		if(ScannerDevice.allowedFunctions.indexOf(command) == -1){
 			if(Debugging)
@@ -156,14 +149,6 @@ ScannerDevice = function (mappings){
 		}
 		cordova.exec(callback || emptyFn, errorCallback || emptyErrFn, "LineaDevice", command, args || []);
 		return true;
-	};
-	/**
-	* Enables or Disables a single barcode by it's ID.
-	* @param {Int} Integer of barcode enableing/disableing (see ScannerDevice.CONSTANTS.BAR_TYPES for mappings).
-	* @param {Boolean} enabled To enable or disable barcode.
-	*/
-	this.enableBarcode = function (barcode, enabled){
-		this.sendCommand('enableBarcode', [barcode, enabled]);
 	};
 	/**
 	* Plays a sound from the linea device.
@@ -190,6 +175,7 @@ ScannerDevice = function (mappings){
 			}
 		}
 		this.sendCommand('playSound', [100, newSounds]);
+		return true;
 	};
 	/**
 	* Starts the scanner on device.
@@ -236,6 +222,7 @@ ScannerDevice = function (mappings){
 			}
 		}
 		this.sendCommand('setScanBeep', [enabled ? true : false, 100, newSounds]);
+		return true;
 	};
 	/**
 	* Sets if the button is enabled or disabled on the scanner.
@@ -280,28 +267,6 @@ ScannerDevice = function (mappings){
 		});
 	};
 	/**
-	* Check weather barcode is enabled or not.
-	*
-	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var enabled = params[0]; }
-	* @param {Int} barcode Barcode to check if enabled. See ScannerDevice.CONSTANTS.BAR_TYPES.* for available values.
-	*/
-	this.isBarcodeEnabled = function (callback, barcode){
-		this.sendCommand('isBarcodeEnabled', [barcode], function (params){
-			callback(params[0]);
-		});
-	};
-	/**
-	* Checks if barcode is supported.
-	*
-	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var supported = params[0]; }
-	* @param {Int} barcode Barcode to check if supported. See ScannerDevice.CONSTANTS.BAR_TYPES.* for available values.
-	*/
-	this.isBarcodeSupported = function (callback, barcode){
-		this.sendCommand('isBarcodeSupported', [barcode], function (params){
-			callback(params[0]);
-		});
-	};
-	/**
 	* Checks if device is charging.
 	*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var charging = params[0]; }
@@ -318,16 +283,6 @@ ScannerDevice = function (mappings){
 	*/
 	this.setCharging = function (enabled){
 		this.sendCommand('setCharging', [enabled ? true : false]);
-	};
-	/**
-	* Retreives the sync button mode (Very little documentation is given on this, so I am not even sure what it does.)
-	*
-	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var sync_mode = params[0]; }
-	*/
-	this.getSyncButtonMode = function (callback){
-		this.sendCommand('getSyncButtonMode', [], function (params){
-			callback(parseInt(params[0]));
-		});
 	};
 	/**
 	* Tries to process credit card info from a swipped card.
@@ -352,40 +307,21 @@ ScannerDevice = function (mappings){
 		});
 	};
 	/**
-	* Gets the mode cards are received in. See: ScannerDevice.CONSTANTS.MS_* for more info.
-	*
-	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var mode = params[0]; }
-	*/
-	this.getMSCardDataMode = function (callback){
-		this.sendCommand('getMSCardDataMode', [], function (params){
-			callback(params[0]);
-		});
-	};
-	/**
 	* Gets the mode barcodes will be scanned in. See: ScannerDevice.CONSTANTS.BARCODE_TYPE_*
 	* @param {Function} callback Callback to execute after info is received. Example: function (params) { var bar_type_mode = params[0]; }
 	*/
-	this.getBarcodeTypeMode = function (type, callback){
+	this.getBarcodeTypeMode = function (callback){
 		this.sendCommand('getBarcodeTypeMode', [], function (){
 			callback(params[0]);
 		});
-	};
-	/**
-	* You can turn the barcode engine off with this function. When the engine is turned back on it may take up to 2 seconds for device to be
-	* responsive again. (Don't play with this unless you know what you are doing.)
-	*
-	* @param {Boolean} enabled Weather to enable or disable engine.
-	*/
-	this.barcodeEnginePowerControl = function (enabled){
-		this.sendCommand('barcodeEnginePowerControl', []);
 	};
 	/**
 	* Helper function to get the name of barcodes by their code.
 	*
 	* @param {Int} type Barcode type to get name. See: ScannerDeice.CONSTANTS.BAR_TYPES.* for available barcodes.
 	*/
-	this.barcodeType2Text = function (type, callback){
-		this.sendCommand('barcodeType2Text', [], function (params){
+	this.barcodeType2Text = function (callback, type){
+		this.sendCommand('barcodeType2Text', [type], function (params){
 			callback(params[0]);
 		});
 	};
@@ -398,7 +334,37 @@ ScannerDevice = function (mappings){
 		this.sendCommand('getConnectionState', [], function (params){
 			callback(params[0]);
 		});
-	}
+	};
+	/**
+	 * Enables the RFID engine in device
+	 * @param {Function} callback Callback to execute after info is received.
+	 * @param {Int} types RFID types to enable receiving.
+	 */
+	this.rfInit = function (callback, types){
+		this.sendCommand('rfInit', [types], function (params){
+			callback(params[0]);
+		});
+	};
+	/**
+	 * Turns the RFID engine off on the device
+	 * @param {Function} callback Callback to execute after info is received.
+	 */
+	this.rfClose = function (callback){
+		this.sendCommand('rfClose', [], function (params){
+			callback(params[0]);
+		});
+	};
+	/**
+	 * Removes card from field of scan and removes it's reference from memory. It's reccomended to call this when you are done with the card's data.
+	 * @param {Function} callback Callback to execute after info is received.
+	 * @param {Int} cardIndex Index of the card.
+	 */
+	this.rfRemoveCard = function (callback, cardIndex){
+		this.sendCommand('rfRemoveCard', [cardIndex], function (params){
+			callback(params[0]);
+		});
+	};
+
 	var i;
 	for(i in mappings){
 		if(ScannerDevice.allowedCallbacks.indexOf(i) != -1 && mappings[i] && mappings[i] instanceof Function){
@@ -413,15 +379,27 @@ ScannerDevice.allowedCallbacks = [
 	'barcodeData',
 	'magneticCardData',
 	'magneticCardRawData',
+	'magneticJISCardData',
+	'smartCardInserted',
+	'smartCardRemoved',
+	'barcodeDataIsoType',
+	'PINEntryCompleteWithError',
+	'paperStatus',
+	'rfCardDetected',
+	'bluetoothDeviceConnected',
+	'bluetoothDeviceDisconnected',
+	'bluetoothDiscoverComplete',
+	'bluetoothDeviceDiscovered',
+	'rfCardRemoved',
 	'buttonPressed',
 	'buttonReleased',
+	'featureSupported',
 	'connectionState'
 ];
 /**
 * Allowed functions that scanner accepts.
 */
 ScannerDevice.allowedFunctions = [
-	'enableBarcode',
 	'playSound',
 	'startScan',
 	'stopScan',
@@ -430,19 +408,19 @@ ScannerDevice.allowedFunctions = [
 	'setScanButtonMode',
 	'setMSCardDataMode',
 	'setBarcodeTypeMode',
+	'getScanButtonMode',
+	'getScanMode',
 	'getBatteryCapacity',
 	'getBatteryVoltage',
-	'isBarcodeEnabled',
-	'isBarcodeSupported',
-	'getMSCardDataMode',
 	'getCharging',
 	'setCharging',
-	'getSyncButtonMode',
 	'msProcessFinancialCard',
 	'getBarcodeTypeMode',
-	'barcodeEnginePowerControl',
-	'barcodeType2Text',
 	'getConnectionState',
+	'barcodeType2Text',
+	'rfInit',
+	'rfClose',
+	'rfRemoveCard',
 ];
 /**
 * List of objects listeneing on device.
@@ -548,6 +526,7 @@ ScannerDevice.triggerEvent = function (params){
 			cordova.exec(emptyFn, emptyErrFn, "LineaDevice", 'configureAllSettings', [ScannerDevice.lastSettings]);
 		}
 	}
+	return true;
 };
 /**
 * Usefull constants.
@@ -574,6 +553,74 @@ ScannerDevice.CONSTANTS = {
 	BARCODE_TYPE_DEFAULT:0,
 	BARCODE_TYPE_EXTENDED:1,
 
+	/* BEGIN CARD TYPES */
+	CARD_TYPES: {
+		/**
+		 Unknown card
+		 */
+		CARD_UNKNOWN: 0,
+		/**
+		 Mifare Mini
+		 */
+		CARD_MIFARE_MINI: 1,
+		/**
+		 Mifare Classic 1K
+		 */
+		CARD_MIFARE_CLASSIC_1K: 2,
+		/**
+		 Mifare Classic 4K
+		 */
+		CARD_MIFARE_CLASSIC_4K: 3,
+		/**
+		 Mifare Ultralight
+		 */
+		CARD_MIFARE_ULTRALIGHT: 4,
+		/**
+		 Mifare Ultralight C
+		 */
+		CARD_MIFARE_ULTRALIGHT_C: 5,
+		/**
+		 ISO 14443A
+		 */
+		CARD_ISO14443A: 6,
+		/**
+		 Mifare Plus
+		 */
+		CARD_MIFARE_PLUS: 7,
+		/**
+		 ISO 15693
+		 */
+		CARD_ISO15693: 8,
+		/**
+		 Mifare Desfire
+		 */
+		CARD_MIFARE_DESFIRE: 9,
+		/**
+		 ISO 14443B
+		 */
+		CARD_ISO14443B: 10,
+		/**
+		 FeliCa
+		 */
+		CARD_FELICA: 11,
+		/**
+		 ST SRI
+		 */
+		CARD_ST_SRI: 12,
+		/**
+		 NFC Payment
+		 */
+		CARD_PAYMENT: 13,
+		/**
+		 PicoPass 15693
+		 */
+		CARD_PICOPASS_15693: 14,
+		/**
+		 PicoPass 14443-B
+		 */
+		CARD_PICOPASS_14443B: 15
+	},
+	/* END CARD TYPES */
 
 	/* BEGIN BARCODE TYPES */
 	BAR_TYPES: {
@@ -687,19 +734,8 @@ ScannerDevice.lastSettings = {
 	BUTTON_ENABLED: ScannerDevice.CONSTANTS.BUTTON_ENABLED,
 	MS_MODE: ScannerDevice.CONSTANTS.MS_PROCESSED_CARD_DATA,
 	BARCODE_TYPE: ScannerDevice.CONSTANTS.BARCODE_TYPE_DEFAULT,
-	BARCODE_ENGINE_POWER: true,
-	CHARGING: false,
-	barcodeStatus: {
-	}
+	CHARGING: false
 };
-(function (){
-	var i;
-	for(i in ScannerDevice.CONSTANTS.BAR_TYPES){
-		if(i != 'BAR_EX_LAST' && i != 'BAR_LAST' && i != 'BAR_EX_ALL' && i != 'BAR_ALL'){
-			ScannerDevice.lastSettings.barcodeStatus[ScannerDevice.CONSTANTS.BAR_TYPES[i]] = true;
-		}
-	}
-})();
 
 ScannerDevice.LAZER_ON = false;
 ScannerDevice.CONNECTION_STATE = ScannerDevice.CONSTANTS.CONN_DISCONNECTED;
